@@ -1,0 +1,3 @@
+[submodule "submipfs"]
+	path = submipfs
+	url = https://github.com/jamjam2103/Private-File-Share-Submodule.git
