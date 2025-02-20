@@ -1,5 +1,5 @@
 import { ChatRoom } from "@/components/chat/chat-room";
-import { FileBoard } from "@/components/file-board/file-board";
+import { FileShareButton } from "@/components/file-board/file-board";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { LogOut } from "lucide-react";
@@ -37,7 +37,7 @@ export default function HomePage() {
           
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">File Sharing</h2>
-            <FileBoard />
+            <FileShareButton />
           </div>
         </div>
       </main>

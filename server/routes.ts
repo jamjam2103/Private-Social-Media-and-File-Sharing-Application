@@ -5,7 +5,8 @@ import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { Message, FileShare } from "@shared/schema";
 import * as crypto from 'crypto';
-
+const validTokens = new Map<string, number>();
+const TOKEN_EXPIRY = 30 * 60 * 1000;
 export async function registerRoutes(app: Express): Promise<Server> {
   setupAuth(app);
 
@@ -19,7 +20,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     next();
   };
+  app.post("/api/generate-token", (req, res) => {
+    const token = crypto.randomBytes(32).toString('hex');
+    validTokens.set(token, Date.now());
+    res.json({ token });
+  });
 
+  // Verify access token
+  app.post("/api/verify-token", (req, res) => {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ message: "Token is required" });
+    }
+
+    const timestamp = validTokens.get(token);
+
+    if (!timestamp) {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+
+    if (Date.now() - timestamp > TOKEN_EXPIRY) {
+      validTokens.delete(token); // Clean up expired token
+      return res.status(401).json({ message: "Token expired" });
+    }
+
+    res.json({ valid: true });
+  });
   // Add file routes with auth
   app.post("/api/files", authMiddleware, async (req, res) => {
     try {
